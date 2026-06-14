@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -43,8 +44,3 @@ jobs:
           name: 'Jars'
           path: build/libs/*.jar
           retention-days: 7
-
-      - name: Generate artifact attestation
-        uses: actions/attest@v4
-        with:
-          subject-path: build/libs/*.jar
