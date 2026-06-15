@@ -8,10 +8,10 @@ import requests
 def main():
     metadata = {
         "changelog": Path("CHANGELOG.md").read_text(encoding="utf-8"),
-        "changelogType": "markdown",
+        "changelogType": ["markdown"],
         "displayName": f"{os.environ.get("REPOSITORY_NAME")} {os.environ.get("VERSION")}",
         "gameVersions": [ 11779 ],  # Minecraft 1.21.1
-        "gameVersionNames": ["Client", "Server", "1.21.1"],
+        "gameVersionNames": ["Client", "Server", "NeoForge", "1.21.1"],
         "releaseType": "release",
         "relations": {
             "projects": []
