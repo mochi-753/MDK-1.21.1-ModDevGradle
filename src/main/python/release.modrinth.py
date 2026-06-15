@@ -6,12 +6,11 @@ from pathlib import Path
 import requests
 
 def main():
-    MODRINTH_TOKEN = os.environ.get("MODRINTH_TOKEN")
-
-    metadata = {
+    data = {
         "name": f"{os.environ.get("REPOSITORY_NAME")} {os.environ.get("VERSION")}",
         "version_number": os.environ.get("VERSION").removeprefix("v"),
         "changelog": Path("CHANGELOG.md").read_text(encoding="utf-8"),
+        "dependencies": [],
         "game_versions": ["1.21.1"],
         "version_type": "release",
         "loaders": ["neoforge"],
@@ -20,7 +19,7 @@ def main():
     }
 
     with open("src/main/python/dependencies.modrinth.json", "r", encoding="utf-8") as f:
-        metadata["dependencies"] = json.load(f)
+        data["dependencies"] = json.load(f)
 
     with ExitStack() as stack:
         files = {}
@@ -35,17 +34,17 @@ def main():
         if not file_parts:
             raise FileNotFoundError("No Jar files found.")
 
-        metadata["file_parts"] = file_parts
-        metadata["primary_file"] = file_parts[0]
+        data["file_parts"] = file_parts
+        data["primary_file"] = file_parts[0]
 
         response = requests.post(
             "https://api.modrinth.com/v2/version",
             headers={
-                "Authorization": MODRINTH_TOKEN,
+                "Authorization": os.environ.get("MODRINTH_TOKEN"),
                 "User-Agent": f"{os.environ.get("REPOSITORY")}/{os.environ.get("VERSION")}"
             },
             data={
-                "data": json.dumps(metadata)
+                "data": json.dumps(data)
             },
             files=files
         )

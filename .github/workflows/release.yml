@@ -34,7 +34,7 @@ jobs:
       - name: Build with Gradle
         run: chmod u+x ./gradlew && ./gradlew build
 
-      - name: Upload artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: 'Jars'
@@ -95,7 +95,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r src/main/python/requirements.txt
 
-      - name: Create GitHub releases
+      - name: Verify attestations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for jar in *.jar; do
+            gh attestation verify "$jar" --repo "${{ github.repository }}"
+          done
+          
+          cat >> CHANGELOG.md << 'EOF'
+          
+          ## ✅ Artifact Attestation
+          
+          The release JARs have been automatically verified by this project's GitHub Actions workflow using GitHub Artifact Attestations, confirming that they are authentic artifacts produced by the official CI pipeline.
+          EOF
+
+      - name: Create GitHub release
         if: vars.CREATE_GITHUB_RELEASE != ''
         uses: softprops/action-gh-release@v3
         with:
@@ -103,6 +118,16 @@ jobs:
           files: '*.jar'
           name: '${{ github.event.repository.name }} ${{ steps.tag.outputs.latest_tag }}'
           tag_name: ${{ steps.tag.outputs.latest_tag }}
+
+      - name: Create CurseForge release
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          VERSION: ${{ steps.tag.outputs.latest_tag }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+        if: vars.CURSEFORGE_PROJECT_ID != '' && env.CURSEFORGE_TOKEN != ''
+        run: python src/main/python/release.curseforge.py
 
       - name: Create Modrinth release
         env:
