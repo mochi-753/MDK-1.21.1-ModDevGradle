@@ -76,7 +76,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for jar in *.jar; do
+          for jar in artifact/*.jar; do
             gh attestation verify "$jar" --repo "${{ github.repository }}"
           done
 
