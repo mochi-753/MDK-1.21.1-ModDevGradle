@@ -75,25 +75,26 @@ jobs:
     needs: build
     if: inputs.create-github-release || inputs.create-curseforge-release || inputs.create-modrinth-release
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: 'artifact'
-
-      - name: Get mod metadata
-        id: metadata
-        run: |
-          echo "mod_id=$(jq -r '.modID' metadata.json)" >> "$GITHUB_OUTPUT"
-          echo "mod_name=$(jq -r '.modName' metadata.json)" >> "$GITHUB_OUTPUT"
-          echo "mod_version=$(jq -r '.modVersion' metadata.json)" >> "$GITHUB_OUTPUT"
-          echo "curseforge_project_id=$(jq -r '.curseForgeProjectID' metadata.json)" >> "$GITHUB_OUTPUT"
-          echo "modrinth_project_id=$(jq -r '.modrinthProjectID' metadata.json)" >> "$GITHUB_OUTPUT"
-
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
+
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: 'artifact'
+          path: artifacts
+
+      - name: Get mod metadata
+        id: metadata
+        run: |
+          echo "mod_id=$(jq -r '.modID' artifacts/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "mod_name=$(jq -r '.modName' artifacts/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$(jq -r '.modVersion' artifacts/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "curseforge_project_id=$(jq -r '.curseForgeProjectID' artifacts/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "modrinth_project_id=$(jq -r '.modrinthProjectID' artifacts/metadata.json)" >> "$GITHUB_OUTPUT"
 
       - name: Create release tag
         id: tag
@@ -126,7 +127,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for jar in *.jar; do
+          for jar in artifacts/*.jar; do
             gh attestation verify "$jar" --repo "${{ github.repository }}"
           done
           
@@ -155,7 +156,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
-          files: '*.jar'
+          files: 'artifacts/*.jar'
           make_latest: true
           name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
           tag_name: ${{ steps.tag.outputs.release_tag }}
@@ -165,7 +166,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
-          files: '*.jar'
+          files: 'artifacts/*.jar'
           name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
           prerelease: true
           tag_name: ${{ steps.tag.outputs.release_tag }}
