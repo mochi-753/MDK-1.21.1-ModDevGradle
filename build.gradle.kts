@@ -172,11 +172,13 @@ val exportModMetadata = tasks.register("exportModMetadata") {
         file.parentFile.mkdirs()
 
         val metadata = """
-            "modID": "${ModConfig.MOD_ID}",
-            "modName": "${ModConfig.MOD_NAME}",
-            "modVersion": "${ModConfig.MOD_VERSION}",
-            "curseForgeProjectID": "${ModConfig.CURSEFORGE_PROJECT_ID}",
-            "modrinthProjectID": "${ModConfig.MODRINTH_PROJECT_ID}"
+            {
+                "modID": "${ModConfig.MOD_ID}",
+                "modName": "${ModConfig.MOD_NAME}",
+                "modVersion": "${ModConfig.MOD_VERSION}",
+                "curseForgeProjectID": "${ModConfig.CURSEFORGE_PROJECT_ID}",
+                "modrinthProjectID": "${ModConfig.MODRINTH_PROJECT_ID}"
+            }
         """.trimIndent()
 
         file.writeText(metadata)
