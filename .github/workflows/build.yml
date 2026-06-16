@@ -10,7 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  attestations: write
   contents: read
+  id-token: write
 
 jobs:
   build:
