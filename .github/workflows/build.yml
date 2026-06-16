@@ -30,7 +30,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build with Gradle
-        run: chmod u+x ./gradlew && ./gradlew build
+        run: chmod u+x ./gradlew && ./gradlew build --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
