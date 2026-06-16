@@ -12,7 +12,7 @@ def main():
         'changelog': Path('CHANGELOG.md').read_text(encoding='utf-8'),
         'dependencies': [],
         'game_versions': ['1.21.1'],
-        'version_type': 'release',
+        'version_type': os.environ.get('RELEASE_TYPE'),
         'loaders': ['neoforge'],
         'featured': True,
         'project_id': os.environ.get('MODRINTH_PROJECT_ID')
