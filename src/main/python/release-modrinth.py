@@ -25,7 +25,7 @@ def main():
         files = {}
         file_parts = []
 
-        for jar in Path().glob('*.jar'):
+        for jar in Path('artifacts').glob('*.jar'):
             file = stack.enter_context(jar.open('rb'))
             file_part = jar.stem
             file_parts.append(file_part)
