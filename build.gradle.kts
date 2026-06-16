@@ -155,3 +155,7 @@ idea {
         isDownloadSources = true
     }
 }
+
+tasks.withType<JavaExec>().configureEach {
+    standardInput = System.`in`
+}
