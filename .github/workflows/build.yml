@@ -35,10 +35,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          path: build/libs/*
+          name: 'artifact'
+          path: build/libs
           retention-days: 7
 
       - name: Generate artifact attestation
         uses: actions/attest@v4
         with:
-          subject-path: build/libs/*
+          subject-path: build/libs
