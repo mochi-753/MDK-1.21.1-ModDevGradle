@@ -126,6 +126,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          shopt -s nullglob
+          
           for jar in *.jar; do
             gh attestation verify "$jar" --repo "${{ github.repository }}"
           done
