@@ -10,7 +10,7 @@ def main():
     metadata = {
         'changelog': markdown.Markdown(extensions=['extra']).convert(Path('CHANGELOG.md').read_text(encoding='utf-8')),
         'changelogType': 'html',
-        'displayName': f"{os.environ.get('REPOSITORY_NAME')} {os.environ.get('VERSION')}",
+        'displayName': f"{os.environ.get('MOD_NAME')} {os.environ.get('MOD_VERSION')}",
         'gameVersions': [11779],  # Minecraft 1.21.1
         'gameVersionNames': ['Client', 'Server', 'NeoForge', '1.21.1'],
         'releaseType': 'release',
@@ -22,13 +22,13 @@ def main():
     with open('src/main/python/dependencies.curseforge.json', 'r', encoding='utf-8') as dependencies_file:
         metadata['relations']['projects'] = json.load(dependencies_file)
 
-    for jar in Path().glob('*.jar'):
+    for jar in Path('artifact').glob('*.jar'):
         with jar.open('rb') as jar_file:
             response = requests.post(
                 f"https://minecraft.curseforge.com/api/projects/{os.environ.get('CURSEFORGE_PROJECT_ID')}/upload-file",
                 headers={
                     'X-Api-Token': os.environ.get('CURSEFORGE_TOKEN'),
-                    'User-Agent': f"{os.environ.get('REPOSITORY')}/{os.environ.get('VERSION')}"
+                    'User-Agent': f"{os.environ.get('REPOSITORY')}/{os.environ.get('MOD_VERSION')}"
                 },
                 data={
                     'metadata': json.dumps(metadata)

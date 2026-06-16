@@ -7,8 +7,8 @@ import requests
 
 def main():
     data = {
-        'name': f"{os.environ.get('REPOSITORY_NAME')} {os.environ.get('VERSION')}",
-        'version_number': os.environ.get('VERSION').removeprefix('v'),
+        'name': f"{os.environ.get('MOD_NAME')} {os.environ.get('MOD_VERSION')}",
+        'version_number': os.environ.get('MOD_VERSION').removeprefix('v'),
         'changelog': Path('CHANGELOG.md').read_text(encoding='utf-8'),
         'dependencies': [],
         'game_versions': ['1.21.1'],
@@ -41,7 +41,7 @@ def main():
             'https://api.modrinth.com/v2/version',
             headers={
                 'Authorization': os.environ.get('MODRINTH_TOKEN'),
-                'User-Agent': f"{os.environ.get('REPOSITORY')}/{os.environ.get('VERSION')}"
+                'User-Agent': f"{os.environ.get('REPOSITORY')}/{os.environ.get('MOD_VERSION')}"
             },
             data={
                 'data': json.dumps(data)

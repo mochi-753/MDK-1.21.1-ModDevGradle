@@ -21,6 +21,9 @@ object ModConfig {
     const val MOD_DISPLAY_URL = "https://github.com/mochi-753/MDK-1.21.1-ModDevGradle"
     const val MOD_AUTHORS = "Mochi753"
     const val MOD_DESCRIPTION = "EXAMPLE MOD"
+
+    const val CURSEFORGE_PROJECT_ID = ""
+    const val MODRINTH_PROJECT_ID = ""
 }
 
 tasks.named<Wrapper>("wrapper").configure {
@@ -158,4 +161,28 @@ idea {
 
 tasks.withType<JavaExec>().configureEach {
     standardInput = System.`in`
+}
+
+val exportModMetadata = tasks.register("exportModMetadata") {
+    val output = layout.buildDirectory.file("libs/metadata.json")
+    outputs.file(output)
+
+    doLast {
+        val file = output.get().asFile
+        file.parentFile.mkdirs()
+
+        val metadata = """
+            "modID": "${ModConfig.MOD_ID}",
+            "modName": "${ModConfig.MOD_NAME}",
+            "modVersion": "${ModConfig.MOD_VERSION}",
+            "curseForgeProjectID": "${ModConfig.CURSEFORGE_PROJECT_ID}",
+            "modrinthProjectID": "${ModConfig.MODRINTH_PROJECT_ID}"
+        """.trimIndent()
+
+        file.writeText(metadata)
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(exportModMetadata)
 }
