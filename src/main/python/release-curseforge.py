@@ -22,7 +22,7 @@ def main():
     with open('src/main/python/dependencies.curseforge.json', 'r', encoding='utf-8') as dependencies_file:
         metadata['relations']['projects'] = json.load(dependencies_file)
 
-    for jar in Path().glob('*.jar'):
+    for jar in Path('artifacts').glob('*.jar'):
         with jar.open('rb') as jar_file:
             response = requests.post(
                 f"https://minecraft.curseforge.com/api/projects/{os.environ.get('CURSEFORGE_PROJECT_ID')}/upload-file",
