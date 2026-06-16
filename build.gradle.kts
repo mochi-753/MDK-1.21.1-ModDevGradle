@@ -22,8 +22,8 @@ object ModConfig {
     const val MOD_AUTHORS = "Mochi753"
     const val MOD_DESCRIPTION = "EXAMPLE MOD"
 
-    const val CURSEFORGE_PROJECT_ID = ""
-    const val MODRINTH_PROJECT_ID = ""
+    const val CURSEFORGE_PROJECT_ID = "1576170"
+    const val MODRINTH_PROJECT_ID = "MOXi22S6"
 }
 
 tasks.named<Wrapper>("wrapper").configure {
