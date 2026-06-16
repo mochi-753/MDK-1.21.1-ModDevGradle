@@ -152,24 +152,23 @@ jobs:
           pip install -r src/main/python/requirements.txt
 
       - name: Create GitHub release
-        if: inputs.create-github-release && inputs.release-type == 'release'
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
+          draft: true
           files: 'artifacts/*.jar'
-          make_latest: true
           name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
           tag_name: ${{ steps.tag.outputs.release_tag }}
 
-      - name: Create GitHub release (PreRelease)
-        if: inputs.create-github-release && (inputs.release-type == 'beta' || inputs.release-type == 'alpha')
-        uses: softprops/action-gh-release@v3
-        with:
-          body_path: CHANGELOG.md
-          files: 'artifacts/*.jar'
-          name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
-          prerelease: true
-          tag_name: ${{ steps.tag.outputs.release_tag }}
+      - name: Set the release to “Published”
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ inputs.release-type }}" == "release" ]; then
+            gh release edit "${{ steps.tag.outputs.release_tag }}" --draft=false --latest --verify-tag --repo "${{ github.repository }}"
+          elif [ "${{ inputs.release-type }}" == "beta" ] || [ "${{ inputs.release-type }}" == "alpha" ]; then
+            gh release edit "${{ steps.tag.outputs.release_tag }}" --draft=false --prerelease --verify-tag --repo "${{ github.repository }}"
+          fi
 
       - name: Create CurseForge release
         env:
