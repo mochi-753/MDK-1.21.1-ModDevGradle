@@ -181,7 +181,7 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           REPOSITORY: ${{ github.repository }}
         if: inputs.create-curseforge-release && env.CURSEFORGE_PROJECT_ID != '' && env.CURSEFORGE_TOKEN != ''
-        run: python src/main/python/release.curseforge.py
+        run: python src/main/python/release-curseforge.py
 
       - name: Create Modrinth release
         env:
@@ -192,4 +192,4 @@ jobs:
           MODRINTH_PROJECT_ID: ${{ steps.metadata.outputs.modrinth_project_id }}
           REPOSITORY: ${{ github.repository }}
         if: inputs.create-modrinth-release && env.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
-        run: python src/main/python/release.modrinth.py
+        run: python src/main/python/release-modrinth.py
