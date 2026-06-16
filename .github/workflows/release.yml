@@ -1,9 +1,23 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      create-github-release:
+        default: true
+        description: 'Create a GitHub release?'
+        required: false
+        type: boolean
+      create-curseforge-release:
+        default: false
+        description: 'Create a CurseForge release?'
+        required: false
+        type: boolean
+      create-modrinth-release:
+        default: false
+        description: 'Create a Modrinth release?'
+        required: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,41 +46,78 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build with Gradle
-        run: chmod u+x ./gradlew && ./gradlew build
+        run: chmod u+x ./gradlew && ./gradlew build --no-daemon
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: 'Jars'
-          path: build/libs/*.jar
+          name: 'artifact'
+          path: build/libs/
           retention-days: 1
 
       - name: Generate artifact attestation
         uses: actions/attest@v4
         with:
-          subject-path: build/libs/*.jar
+          subject-path: build/libs/
 
   release:
     name: Release
     runs-on: ubuntu-latest
     needs: build
+    if: inputs.create-github-release || inputs.create-curseforge-release || inputs.create-modrinth-release
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: 'artifact'
+          path: artifact
+
+      - name: Verify attestations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for jar in *.jar; do
+            gh attestation verify "$jar" --repo "${{ github.repository }}"
+          done
+
+          cat >> CHANGELOG.md << 'EOF'
+
+          ## ✅ Artifact Attestation
+
+          The release JARs have been automatically verified by this project's GitHub Actions workflow using GitHub Artifact Attestations, \
+          confirming that they are authentic artifacts produced by the official CI pipeline.
+          EOF
+
+      - name: Get mod metadata
+        id: metadata
+        run: |
+          echo "mod_id=$(echo "$JSON" | jq -r '.modID' artifact/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "mod_name=$(echo "$JSON" | jq -r '.modName' artifact/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$(echo "$JSON" | jq -r '.modVersion' artifact/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "curseforge_project_id=$(echo "$JSON" | jq -r '.curseForgeProjectID' artifact/metadata.json)" >> "$GITHUB_OUTPUT"
+          echo "modrinth_project_id=$(echo "$JSON" | jq -r '.modrinthProjectID' artifact/metadata.json)" >> "$GITHUB_OUTPUT"
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Get tags
+      - name: Create release tag
         id: tag
         run: |
-          git fetch origin main --tags
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          LATEST_TAG=$(git describe --tags --abbrev=0)
-          echo "latest_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+          PREVIOUS_TAG="$(git describe --tags --abbrev=0)"
+          RELEASE_TAG="v${{ steps.metadata.outputs.mod_version }}"
           
-          PREVIOUS_TAG=$(git tag --sort=-v:refname | grep -A1 "^$LATEST_TAG$" | tail -n1)
           echo "previous_tag=$PREVIOUS_TAG" >> "$GITHUB_OUTPUT"
+          
+          git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG" HEAD
+          git push origin "$RELEASE_TAG"
+          
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Install git-cliff
         uses: taiki-e/install-action@git-cliff
@@ -76,65 +127,47 @@ jobs:
           if [ -z "${{ steps.tag.outputs.previous_tag }}" ]; then
             echo "First release" > CHANGELOG.md
           else
-            git-cliff --verbose --output CHANGELOG.md --strip all -- ${{ steps.tag.outputs.previous_tag }}..HEAD
+            git-cliff --verbose --output CHANGELOG.md --strip all -- ${{ steps.tag.outputs.previous_tag }}..${{ steps.tag.outputs.release_tag }}
           fi
 
-      - name: Download artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: 'Jars'
-
       - name: Setup Python
+        if: inputs.create-curseforge-release || inputs.create-modrinth-release
         uses: actions/setup-python@v6
         with:
           python-version: '3.14'
           cache: 'pip'
 
       - name: Install dependencies
+        if: inputs.create-curseforge-release || inputs.create-modrinth-release
         run: |
           python -m pip install --upgrade pip
           pip install -r src/main/python/requirements.txt
 
-      - name: Verify attestations
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for jar in *.jar; do
-            gh attestation verify "$jar" --repo "${{ github.repository }}"
-          done
-          
-          cat >> CHANGELOG.md << 'EOF'
-          
-          ## ✅ Artifact Attestation
-          
-          The release JARs have been automatically verified by this project's GitHub Actions workflow using GitHub Artifact Attestations, confirming that they are authentic artifacts produced by the official CI pipeline.
-          EOF
-
       - name: Create GitHub release
-        if: vars.CREATE_GITHUB_RELEASE != ''
+        if: inputs.create-github-release
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
-          files: '*.jar'
-          name: '${{ github.event.repository.name }} ${{ steps.tag.outputs.latest_tag }}'
-          tag_name: ${{ steps.tag.outputs.latest_tag }}
+          files: 'artifact/*.jar'
+          name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
+          tag_name: ${{ steps.tag.outputs.release_tag }}
 
       - name: Create CurseForge release
         env:
-          REPOSITORY: ${{ github.repository }}
-          REPOSITORY_NAME: ${{ github.event.repository.name }}
-          VERSION: ${{ steps.tag.outputs.latest_tag }}
+          MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
+          MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
+          CURSEFORGE_PROJECT_ID: ${{ steps.metadata.outputs.curseforge_project_id }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
-        if: vars.CURSEFORGE_PROJECT_ID != '' && env.CURSEFORGE_TOKEN != ''
+          REPOSITORY: ${{ github.repository }}
+        if: inputs.create-curseforge-release && env.CURSEFORGE_PROJECT_ID != '' && env.CURSEFORGE_TOKEN != ''
         run: python src/main/python/release.curseforge.py
 
       - name: Create Modrinth release
         env:
-          REPOSITORY: ${{ github.repository }}
-          REPOSITORY_NAME: ${{ github.event.repository.name }}
-          VERSION: ${{ steps.tag.outputs.latest_tag }}
+          MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
+          MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
-        if: vars.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
+          MODRINTH_PROJECT_ID: ${{ steps.metadata.outputs.modrinth_project_id }}
+          REPOSITORY: ${{ github.repository }}
+        if: inputs.create-modrinth-release && env.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
         run: python src/main/python/release.modrinth.py

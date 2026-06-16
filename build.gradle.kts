@@ -16,11 +16,14 @@ object ModConfig {
     const val MOD_ID = "examplemod"
     const val MOD_NAME = "Example Mod"
     const val MOD_LICENSE = "MIT"
-    const val MOD_VERSION = "1.0.0"
+    const val MOD_VERSION = "2.0.0"
     const val MOD_GROUP_ID = "io.github.mochi_753.examplemod"
     const val MOD_DISPLAY_URL = "https://github.com/mochi-753/MDK-1.21.1-ModDevGradle"
     const val MOD_AUTHORS = "Mochi753"
     const val MOD_DESCRIPTION = "EXAMPLE MOD"
+
+    const val CURSEFORGE_PROJECT_ID = "1576170"
+    const val MODRINTH_PROJECT_ID = "MOXi22S6"
 }
 
 tasks.named<Wrapper>("wrapper").configure {
@@ -154,4 +157,34 @@ idea {
         isDownloadJavadoc = true
         isDownloadSources = true
     }
+}
+
+tasks.withType<JavaExec>().configureEach {
+    standardInput = System.`in`
+}
+
+val exportModMetadata = tasks.register("exportModMetadata") {
+    val output = layout.buildDirectory.file("libs/metadata.json")
+    outputs.file(output)
+
+    doLast {
+        val file = output.get().asFile
+        file.parentFile.mkdirs()
+
+        val metadata = """
+            {
+                "modID": "${ModConfig.MOD_ID}",
+                "modName": "${ModConfig.MOD_NAME}",
+                "modVersion": "${ModConfig.MOD_VERSION}",
+                "curseForgeProjectID": "${ModConfig.CURSEFORGE_PROJECT_ID}",
+                "modrinthProjectID": "${ModConfig.MODRINTH_PROJECT_ID}"
+            }
+        """.trimIndent()
+
+        file.writeText(metadata)
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(exportModMetadata)
 }
