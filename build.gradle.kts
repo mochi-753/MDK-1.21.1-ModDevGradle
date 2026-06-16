@@ -16,7 +16,7 @@ object ModConfig {
     const val MOD_ID = "examplemod"
     const val MOD_NAME = "Example Mod"
     const val MOD_LICENSE = "MIT"
-    const val MOD_VERSION = "2.0.5"
+    const val MOD_VERSION = "2.0.6"
     const val MOD_GROUP_ID = "io.github.mochi_753.examplemod"
     const val MOD_DISPLAY_URL = "https://github.com/mochi-753/MDK-1.21.1-ModDevGradle"
     const val MOD_AUTHORS = "Mochi753"
