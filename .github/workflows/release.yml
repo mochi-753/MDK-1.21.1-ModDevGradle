@@ -101,7 +101,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          PREVIOUS_TAG="$(git describe --tags --abbrev=0)"
+          PREVIOUS_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
           RELEASE_TAG="v${{ steps.metadata.outputs.mod_version }}"
           
           echo "previous_tag=$PREVIOUS_TAG" >> "$GITHUB_OUTPUT"
