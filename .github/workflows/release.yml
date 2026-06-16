@@ -134,8 +134,7 @@ jobs:
           
           ## ✅ Artifact Attestation
           
-          The release JARs have been automatically verified by this project's GitHub Actions workflow using GitHub Artifact Attestations, \
-          confirming that they are authentic artifacts produced by the official CI pipeline.
+          The release JARs have been automatically verified by this project's GitHub Actions workflow using GitHub Artifact Attestations, confirming that they are authentic artifacts produced by the official CI pipeline.
           EOF
 
       - name: Setup Python
