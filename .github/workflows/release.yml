@@ -3,6 +3,15 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      release-type:
+        default: 'release'
+        description: 'The release channel for this version'
+        required: true
+        type: choice
+        options:
+          - 'release'
+          - 'beta'
+          - 'alpha'
       create-github-release:
         default: true
         description: 'Create a GitHub release?'
@@ -76,7 +85,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for jar in *.jar; do
+          for jar in artifact/*.jar; do
             gh attestation verify "$jar" --repo "${{ github.repository }}"
           done
 
@@ -144,18 +153,30 @@ jobs:
           pip install -r src/main/python/requirements.txt
 
       - name: Create GitHub release
-        if: inputs.create-github-release
+        if: inputs.create-github-release && inputs.release-type == 'release'
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: CHANGELOG.md
+          files: 'artifact/*.jar'
+          make_latest: true
+          name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+
+      - name: Create GitHub release (PreRelease)
+        if: inputs.create-github-release && (inputs.release-type == 'beta' || inputs.release-type == 'alpha')
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
           files: 'artifact/*.jar'
           name: "${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}"
+          prerelease: true
           tag_name: ${{ steps.tag.outputs.release_tag }}
 
       - name: Create CurseForge release
         env:
           MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
           MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
+          RELEASE_TYPE: ${{ inputs.release-type }}
           CURSEFORGE_PROJECT_ID: ${{ steps.metadata.outputs.curseforge_project_id }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           REPOSITORY: ${{ github.repository }}
@@ -166,6 +187,7 @@ jobs:
         env:
           MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
           MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
+          RELEASE_TYPE: ${{ inputs.release-type }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_PROJECT_ID: ${{ steps.metadata.outputs.modrinth_project_id }}
           REPOSITORY: ${{ github.repository }}

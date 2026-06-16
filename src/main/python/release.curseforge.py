@@ -13,7 +13,7 @@ def main():
         'displayName': f"{os.environ.get('MOD_NAME')} {os.environ.get('MOD_VERSION')}",
         'gameVersions': [11779],  # Minecraft 1.21.1
         'gameVersionNames': ['Client', 'Server', 'NeoForge', '1.21.1'],
-        'releaseType': 'release',
+        'releaseType': os.environ.get('RELEASE_TYPE'),
         'relations': {
             'projects': []
         }
