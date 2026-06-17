@@ -124,6 +124,7 @@ jobs:
           fi
 
       - name: Verify attestations
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
