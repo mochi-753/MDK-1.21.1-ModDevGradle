@@ -152,6 +152,8 @@ jobs:
           pip install -r src/main/python/requirements.txt
 
       - name: Create GitHub release
+        id: release_github
+        continue-on-error: true
         uses: softprops/action-gh-release@v3
         with:
           body_path: CHANGELOG.md
@@ -161,6 +163,8 @@ jobs:
           tag_name: ${{ steps.tag.outputs.release_tag }}
 
       - name: Set the release to “Published”
+        id: publish_github
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -171,6 +175,8 @@ jobs:
           fi
 
       - name: Create CurseForge release
+        id: release_curseforge
+        continue-on-error: true
         env:
           MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
           MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
@@ -182,6 +188,8 @@ jobs:
         run: python src/main/python/release-curseforge.py
 
       - name: Create Modrinth release
+        id: release_modrinth
+        continue-on-error: true
         env:
           MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
           MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
@@ -191,3 +199,23 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         if: inputs.create-modrinth-release && env.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
         run: python src/main/python/release-modrinth.py
+
+      - name: Check release results
+        if: always()
+        run: |
+          set -e
+          
+          check() {
+            local name="$1"
+            local outcome="$2"
+          
+            if [[ "$outcome" == "failure" || "$outcome" == "cancelled" ]]; then
+              echo "::error::$name failed. ($outcome)"
+              exit 1
+            fi
+          }
+          
+          check "GitHub Release" "${{ steps.release_github.outcome }}"
+          check "GitHub Publish" "${{ steps.publish_github.outcome }}"
+          check "CurseForge Release" "${{ steps.release_curseforge.outcome }}"
+          check "Modrinth Release" "${{ steps.release_modrinth.outcome }}"
