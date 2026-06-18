@@ -69,6 +69,12 @@ neoForge {
             gameDirectory.set(file("runs/client"))
         }
 
+        create("client2") {
+            client()
+            systemProperty("neoforge.enabledGameTestNamespaces", ModConfig.MOD_ID)
+            gameDirectory.set(file("runs/client2"))
+        }
+
         create("server") {
             server()
             programArgument("--nogui")
