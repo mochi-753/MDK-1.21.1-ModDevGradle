@@ -40,6 +40,34 @@ sourceSets.main.get().resources {
 
 repositories {
     mavenCentral()
+
+    /*
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "CurseForge"
+                url = uri("https://cursemaven.com")
+            }
+        }
+        filter {
+            includeGroup("curse.maven")
+        }
+    }
+     */
+
+    /*
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = uri("https://api.modrinth.com/maven")
+            }
+        }
+        filter {
+            includeGroup("maven.modrinth")
+        }
+    }
+     */
 }
 
 base {
