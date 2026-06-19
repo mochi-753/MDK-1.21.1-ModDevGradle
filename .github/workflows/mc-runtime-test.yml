@@ -63,7 +63,7 @@ jobs:
           cp artifacts/*.jar run/mods
 
       - name: Run Minecraft client test
-        uses: headlesshq/mc-runtime-test@v4.4.0
+        uses: headlesshq/mc-runtime-test@4.4.0
         with:
           mc: 1.21.1
           modloader: neoforge
@@ -94,7 +94,7 @@ jobs:
           cp artifacts/*.jar run/mods
 
       - name: Run Minecraft client test
-        uses: headlesshq/mc-server-test@v1.1.1
+        uses: headlesshq/mc-server-test@1.1.1
         with:
           mc: 1.21.1
           modloader: neoforge
