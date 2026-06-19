@@ -143,10 +143,9 @@ neoForge {
     }
 }
 
-val localRuntime: Configuration by configurations.creating
+val localRuntime = configurations.create("localRuntime")
 configurations {
     runtimeClasspath {
-        @Suppress("UnstableApiUsage")
         extendsFrom(localRuntime)
     }
 }
