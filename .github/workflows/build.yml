@@ -40,3 +40,4 @@ jobs:
           name: 'artifact'
           path: build/libs/*
           retention-days: 7
+          compression-level: 9

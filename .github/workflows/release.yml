@@ -63,6 +63,7 @@ jobs:
           name: 'artifact'
           path: build/libs/*
           retention-days: 1
+          compression-level: 9
 
       - name: Generate artifact attestation
         uses: actions/attest@v4.1.0
