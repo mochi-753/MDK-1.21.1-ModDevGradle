@@ -40,8 +40,3 @@ jobs:
           name: 'artifact'
           path: build/libs/*
           retention-days: 7
-
-      - name: Generate artifact attestation
-        uses: actions/attest@v4.1.0
-        with:
-          subject-path: build/libs
