@@ -257,6 +257,48 @@ Repository secrets:
 | `CURSEFORGE_TOKEN` | CurseForge publishing |
 | `MODRINTH_TOKEN`   | Modrinth publishing   |
 
+### Configuring Dependencies
+
+The release scripts read dependency information from:
+
+* `src/main/python/dependencies.curseforge.json`
+* `src/main/python/dependencies.modrinth.json`
+
+If your mod has no dependencies, leave the files as an empty JSON array:
+
+```json
+[]
+```
+
+Otherwise, add your project's dependencies using the appropriate format for each platform.
+
+Example (`dependencies.curseforge.json`):
+
+```json
+[
+  {
+    "slug": "jei", // The slug of the project it depends on.
+    "projectID": 238222, // The ID of the project being depended on. Must be a number.
+    "type": "requiredDependency" // Dependency type. You can select one of the following: [“embeddedLibrary”, “incompatible”, “optionalDependency”, ‘requiredDependency’, “tool”].
+  }
+]
+```
+
+Example (`dependencies.modrinth.json`):
+
+```json
+[
+  {
+    "version_id": null, // The ID of the version being used. If this is null, it means any version can be used.
+    "project_id": "u6dRKJwZ", // The ID of the project being depended on.
+    "file_name": null, // I think that's the filename within the dependent project. I'm sorry, I'm not really sure.
+    "dependency_type": "required" // Dependency type. You can select one of the following: [“required”, “optional”, “incompatible”, ‘embedded’].
+  }
+]
+```
+
+Replace the example values with the dependencies required by your own mod before publishing.
+
 ---
 
 # Dependabot
