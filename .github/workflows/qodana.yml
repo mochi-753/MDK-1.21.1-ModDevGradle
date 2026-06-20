@@ -11,9 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
-  pull-requests: write
   checks: write
+  contents: read
+  pull-requests: write
 
 jobs:
   qodana:
@@ -30,9 +30,13 @@ jobs:
         uses: JetBrains/qodana-action@v2026.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        if: env.QODANA_TOKEN != ''
         with:
-          pr-mode: false
+          args: |
+            --linter qodana-jvm-community
+            --within-docker false
+            --print-problems
+            --profile-name qodana.recommended
+            --log-level debug
           use-caches: false
-          post-pr-comment: true
-          use-annotations: true
-          upload-result: false
+          pr-mode: false
