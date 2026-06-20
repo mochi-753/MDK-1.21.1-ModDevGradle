@@ -195,7 +195,7 @@ jobs:
             1.21.1
           release_type: ${{ inputs.release-type }}
           relations_path: src/main/templates/META-INF/dependencies-curseforge.json
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CURSEFORGE_TOKEN }}
           project_id: ${{ steps.metadata.outputs.curseforge_project_id }}
           files_path: artifacts
 
