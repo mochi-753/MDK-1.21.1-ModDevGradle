@@ -181,7 +181,7 @@ jobs:
       - name: Create CurseForge release
         id: release_curseforge
         continue-on-error: true
-        uses: mochi-753/action-curseforge-release@v1.2.2
+        uses: mochi-753/action-curseforge-release@v1.2.4
         with:
           change_log_path: CHANGELOG.md
           change_log_type: markdown
