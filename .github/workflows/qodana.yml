@@ -32,7 +32,7 @@ jobs:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           pr-mode: false
-          use-caches: true
+          use-caches: false
           post-pr-comment: true
           use-annotations: true
           upload-result: false
