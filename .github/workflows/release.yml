@@ -179,15 +179,23 @@ jobs:
       - name: Create CurseForge release
         id: release_curseforge
         continue-on-error: true
-        env:
-          MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
-          MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
-          RELEASE_TYPE: ${{ inputs.release-type }}
-          CURSEFORGE_PROJECT_ID: ${{ steps.metadata.outputs.curseforge_project_id }}
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          REPOSITORY: ${{ github.repository }}
-        if: inputs.create-curseforge-release && env.CURSEFORGE_PROJECT_ID != '' && env.CURSEFORGE_TOKEN != ''
-        run: python src/main/python/release-curseforge.py
+        uses: mochi-753/action-curseforge-release@v1.2.1
+        with:
+          change_log_path: CHANGELOG.md
+          change_log_type: markdown
+          name: ${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}
+          game_versions: |
+            11779
+          game_version_names: |
+            Client
+            Server
+            NeoForge
+            1.21.1
+          release_type: ${{ inputs.release-type }}
+          relations_path: src/main/templates/META-INF/dependencies-curseforge.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+          project_id: ${{ steps.metadata.outputs.curseforge_project_id }}
+          files_path: artifacts
 
       - name: Create Modrinth release
         id: release_modrinth
