@@ -202,15 +202,19 @@ jobs:
       - name: Create Modrinth release
         id: release_modrinth
         continue-on-error: true
-        env:
-          MOD_NAME: ${{ steps.metadata.outputs.mod_name }}
-          MOD_VERSION: ${{ steps.tag.outputs.release_tag }}
-          RELEASE_TYPE: ${{ inputs.release-type }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_PROJECT_ID: ${{ steps.metadata.outputs.modrinth_project_id }}
-          REPOSITORY: ${{ github.repository }}
-        if: inputs.create-modrinth-release && env.MODRINTH_PROJECT_ID != '' && env.MODRINTH_TOKEN != ''
-        run: python src/main/python/release-modrinth.py
+        if: inputs.create-modrinth-release
+        uses: mochi-753/action-modrinth-release@v1.2.0
+        with:
+          change_log_path: CHANGELOG.md
+          name: ${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}
+          files_path: artifacts
+          game_versions: 1.21.1
+          loaders: neoforge
+          version_type: ${{ inputs.release-type }}
+          dependencies_path: src/main/templates/META-INF/dependencies-modrinth.json
+          project_id: ${{ steps.metadata.outputs.modrinth_project_id }}
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          version_number: ${{ steps.metadata.outputs.mod_version }}
 
       - name: Check release results
         if: always()
