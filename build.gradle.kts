@@ -99,6 +99,7 @@ neoForge {
 
         create("client2") {
             client()
+            programArguments.addAll("--username", "Dev2")
             systemProperty("neoforge.enabledGameTestNamespaces", ModConfig.MOD_ID)
             gameDirectory.set(file("runs/client2"))
         }
