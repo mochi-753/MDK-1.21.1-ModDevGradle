@@ -170,24 +170,24 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
+        if: inputs.create-github-release
         run: |
           if [ "${{ inputs.release-type }}" == "release" ]; then
             gh release edit "${{ steps.tag.outputs.release_tag }}" --draft=false --latest --verify-tag --repo "${{ github.repository }}"
           elif [ "${{ inputs.release-type }}" == "beta" ] || [ "${{ inputs.release-type }}" == "alpha" ]; then
             gh release edit "${{ steps.tag.outputs.release_tag }}" --draft=false --prerelease --verify-tag --repo "${{ github.repository }}"
           fi
-        if: inputs.create-github-release
 
       - name: Create CurseForge release
         id: release_curseforge
         continue-on-error: true
-        uses: mochi-753/action-curseforge-release@v1.2.4
+        if: inputs.create-curseforge-release
+        uses: mochi-753/action-curseforge-release@v1.3.0
         with:
           change_log_path: CHANGELOG.md
           change_log_type: markdown
           name: ${{ steps.metadata.outputs.mod_name }} ${{ steps.tag.outputs.release_tag }}
-          game_versions: |
-            11779
+          game_versions: 11779
           game_version_names: |
             Client
             Server
