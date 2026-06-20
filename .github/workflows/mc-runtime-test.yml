@@ -39,6 +39,7 @@ jobs:
           name: 'artifact'
           path: build/libs/*
           retention-days: 1
+          compression-level: 9
 
   client-test:
     name: Client Test
