@@ -40,3 +40,8 @@ jobs:
             --log-level debug
           use-caches: false
           pr-mode: false
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v4.36.0
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
