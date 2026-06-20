@@ -1,8 +1,0 @@
-version: "1.0"
-
-profile:
-  name: qodana.recommended
-
-projectJDK: "21"
-
-linter: jetbrains/qodana-jvm-community:2026.1
