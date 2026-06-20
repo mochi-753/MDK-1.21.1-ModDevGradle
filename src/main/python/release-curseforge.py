@@ -20,7 +20,7 @@ def main():
     }
 
     try:
-        with open('src/main/python/dependencies.curseforge.json', 'r', encoding='utf-8') as dependencies_file:
+        with open('src/main/python/dependencies-curseforge.json', 'r', encoding='utf-8') as dependencies_file:
             metadata['relations']['projects'] = json.load(dependencies_file)
     except FileNotFoundError:
         pass
