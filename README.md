@@ -261,8 +261,8 @@ Repository secrets:
 
 The release scripts read dependency information from:
 
-* `src/main/python/dependencies.curseforge.json`
-* `src/main/python/dependencies.modrinth.json`
+* `src/main/templates/dependencies-curseforge.json`
+* `src/main/templates/dependencies-modrinth.json`
 
 If your mod has no dependencies, leave the files as an empty JSON array:
 
@@ -272,7 +272,7 @@ If your mod has no dependencies, leave the files as an empty JSON array:
 
 Otherwise, add your project's dependencies using the appropriate format for each platform.
 
-Example (`dependencies.curseforge.json`):
+Example (`dependencies-curseforge.json`):
 
 ```json
 [
@@ -284,7 +284,7 @@ Example (`dependencies.curseforge.json`):
 ]
 ```
 
-Example (`dependencies.modrinth.json`):
+Example (`dependencies-modrinth.json`):
 
 ```json
 [
@@ -321,7 +321,6 @@ Weekly updates for:
 ├── src/
 │   └── main/
 │       ├── java/
-│       ├── python/
 │       ├── resources/
 │       └── templates/
 └── README.md
