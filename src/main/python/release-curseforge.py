@@ -19,8 +19,11 @@ def main():
         }
     }
 
-    with open('src/main/python/dependencies.curseforge.json', 'r', encoding='utf-8') as dependencies_file:
-        metadata['relations']['projects'] = json.load(dependencies_file)
+    try:
+        with open('src/main/python/dependencies.curseforge.json', 'r', encoding='utf-8') as dependencies_file:
+            metadata['relations']['projects'] = json.load(dependencies_file)
+    except FileNotFoundError:
+        pass
 
     for jar in Path('artifacts').glob('*.jar'):
         with jar.open('rb') as jar_file:

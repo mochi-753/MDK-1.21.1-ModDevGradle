@@ -18,8 +18,11 @@ def main():
         'project_id': os.environ.get('MODRINTH_PROJECT_ID')
     }
 
-    with open('src/main/python/dependencies.modrinth.json', 'r', encoding='utf-8') as f:
-        data['dependencies'] = json.load(f)
+    try:
+        with open('src/main/python/dependencies.modrinth.json', 'r', encoding='utf-8') as f:
+            data['dependencies'] = json.load(f)
+    except FileNotFoundError:
+        pass
 
     with ExitStack() as stack:
         files = {}
