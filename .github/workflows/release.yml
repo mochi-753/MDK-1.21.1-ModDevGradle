@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Setup JDK 25
         uses: actions/setup-java@v5.4.0
@@ -77,7 +77,7 @@ jobs:
     if: inputs.create-github-release || inputs.create-curseforge-release || inputs.create-modrinth-release
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           fetch-tags: true
